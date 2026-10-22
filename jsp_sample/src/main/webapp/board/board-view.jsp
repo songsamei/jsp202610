@@ -14,13 +14,19 @@
 		ResultSet rs = null;
 		String boardNo = request.getParameter("boardNo");
 		String query = "SELECT * FROM TBL_BOARD WHERE BOARDNO = " + boardNo;
+		String sessionRole = (String) session.getAttribute("sessionRole");
+		String sessionId = (String) session.getAttribute("sessionId");
+		
+		String updateQuery = "UPDATE TBL_BOARD SET CNT = CNT + 1 WHERE BOARDnO = " + boardNo;
+		stmt.executeUpdate(updateQuery);
+		
 		rs = stmt.executeQuery(query);
 		
 		if(rs.next()){
 			
 		
 	%>
-			<h3>번호 :<%= rs.getString("BOARDNO") %></h3>
+			<h3>번호 :<%= rs.getString("BOARDNO") %> | 조회수 : <%= rs.getString("CNT") %></h3>
 			<h3>제목: <%= rs.getString("TITLE") %></h3>
 			<h4>내용: <%= rs.getString("CONTENTS") %></h4>
 			<h4>작성자: <%= rs.getString("USERID") %></h4>
@@ -34,8 +40,29 @@
 		} 
 	%>
 	<hr>
-	
+	<div>
+		<%
+			if(sessionId.equals(rs.getString("USERID")) || sessionRole.equals("A")){
+		%>
+				<input type="button" value="수정" onclick="fnEidt()">
+				<input type="button" value="삭제" onclick="fnRemove()">
+		<%
+			}
+		%>		
+	</div>
 	
 	
 </body>
 </html>
+<script>
+	function fnRemove(){
+		if(!confirm("정말 삭제???")){
+			return;
+		}
+		location.href="board-remove-result.jsp?boardNo="+<%= boardNo %>;
+	}
+	
+	function fnEidt(){
+		location.href="board-eidt.jsp?boardNo="+<%= boardNo %>;
+	}
+</script>
